@@ -1,0 +1,99 @@
+// docs/requirements.md 9章 データ要件 を参照
+// 原PDFのER図をベースに、line_user_id追加・room_passハッシュ化・Reactions再設計などの改善を反映
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  lineUserId    String   @unique @map("line_user_id")
+  name          String
+  department    String
+  studentNumber String   @map("student_number")
+  email         String
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  createdRooms  Room[]           @relation("RoomCreatedBy")
+  roomUsers     RoomUser[]
+  createdTasks  Task[]           @relation("TaskCreatedBy")
+  submissions   TaskSubmission[]
+  reactions     Reaction[]
+
+  @@map("users")
+}
+
+model Room {
+  id           String   @id @default(cuid())
+  roomName     String   @map("room_name")
+  roomPassHash String   @map("room_pass_hash")
+  createdById  Int      @map("created_by")
+  createdBy    User     @relation("RoomCreatedBy", fields: [createdById], references: [id])
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  roomUsers RoomUser[]
+  tasks     Task[]
+
+  @@map("rooms")
+}
+
+model RoomUser {
+  id       Int      @id @default(autoincrement())
+  roomId   String   @map("room_id")
+  room     Room     @relation(fields: [roomId], references: [id])
+  userId   Int      @map("user_id")
+  user     User     @relation(fields: [userId], references: [id])
+  joinedAt DateTime @default(now()) @map("joined_at")
+
+  @@unique([roomId, userId])
+  @@map("room_users")
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  roomId      String   @map("room_id")
+  room        Room     @relation(fields: [roomId], references: [id])
+  createdById Int      @map("created_by")
+  createdBy   User     @relation("TaskCreatedBy", fields: [createdById], references: [id])
+  title       String
+  description String?
+  deadline    DateTime
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  submissions TaskSubmission[]
+  reactions   Reaction[]
+
+  @@map("tasks")
+}
+
+model TaskSubmission {
+  id          String   @id @default(cuid())
+  taskId      String   @map("task_id")
+  task        Task     @relation(fields: [taskId], references: [id])
+  userId      Int      @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
+  fileUrl     String   @map("file_url")
+  submittedAt DateTime @default(now()) @map("submitted_at")
+
+  @@map("task_submissions")
+}
+
+// 原PDFのReactionsテーブルはUsersと同一カラム構成になっており不整合だったため再設計
+// (docs/requirements.md 9章 / Issue #2)
+model Reaction {
+  id           Int      @id @default(autoincrement())
+  taskId       String   @map("task_id")
+  task         Task     @relation(fields: [taskId], references: [id])
+  userId       Int      @map("user_id")
+  user         User     @relation(fields: [userId], references: [id])
+  reactionType String   @map("reaction_type")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@unique([taskId, userId])
+  @@map("reactions")
+}
