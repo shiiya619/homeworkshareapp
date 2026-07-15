@@ -1,0 +1,50 @@
+# Render Blueprint: DB(Postgres) + API(Express) + Frontend(静的サイト) を一括作成する。
+# Renderダッシュボードの「New +」→「Blueprint」でこのリポジトリを選ぶと読み込まれる。
+# docs: https://render.com/docs/blueprint-spec
+
+databases:
+  - name: homeworkshareapp-db
+    databaseName: homeworkshareapp
+    plan: free
+
+services:
+  # --- バックエンドAPI ---
+  - type: web
+    name: homeworkshareapp-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    # start時に prisma db push でスキーマを同期してからサーバ起動（package.json参照）
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: homeworkshareapp-db
+          property: connectionString
+      - key: NODE_VERSION
+        value: "20.18.0"
+      # フロントのURL確定後に、そのオリジンを設定するとCORSを限定できる（任意）
+      - key: CORS_ORIGIN
+        sync: false
+
+  # --- フロントエンド（静的サイト） ---
+  - type: web
+    name: homeworkshareapp-web
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    # SPA（react-router）のため、全パスをindex.htmlに返す
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      # APIのURL + /api を設定（例: https://homeworkshareapp-api.onrender.com/api）
+      - key: VITE_API_BASE_URL
+        sync: false
+      # LINE DevelopersのLIFF IDを設定（最初は空、Part Dで設定して再デプロイ）
+      - key: VITE_LIFF_ID
+        sync: false

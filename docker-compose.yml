@@ -1,0 +1,17 @@
+# ローカル開発用のPostgreSQL。`docker compose up -d` で起動する。
+# backend/.env の DATABASE_URL はこの値に合わせてある。
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: homeworkshareapp
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

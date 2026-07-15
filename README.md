@@ -8,7 +8,8 @@
 
 - フロントエンド：Vite + React + TypeScript + LINE LIFF SDK（LINEアプリ内で動作するWebアプリ）
 - バックエンド：Node.js + Express + TypeScript + Prisma
-- DB：MVP開発中は SQLite（本番はPostgreSQLへ切替予定）
+- DB：PostgreSQL（ローカルはdocker-compose、本番はRenderの無料PostgreSQL）
+- デプロイ：Render（Blueprint = `render.yaml`）
 
 ## MVPで動く機能
 
@@ -38,28 +39,50 @@ homeworkshareapp/
         └── lib/            # LIFF初期化等の共通処理
 ```
 
-## セットアップ
+## ローカルセットアップ
 
-### バックエンド
+### 0. DB（PostgreSQL）を起動
+
+Docker があれば、リポジトリ直下で：
+
+```bash
+docker compose up -d   # localhost:5432 に postgres を起動
+```
+
+> Dockerを使わない場合は、Renderで作った無料PostgreSQLの External URL を
+> `backend/.env` の `DATABASE_URL` に貼っても動きます。
+
+### 1. バックエンド
 
 ```bash
 cd backend
-cp .env.example .env   # 初期値のままSQLiteで動きます
+cp .env.example .env   # 初期値のままdocker-composeのDBに繋がります
 npm install
-npm run prisma:migrate # SQLite(dev.db)を作成
+npm run db:push        # スキーマをDBに反映（テーブル作成）
 npm run dev            # http://localhost:3000
 ```
 
-### フロントエンド
+### 2. フロントエンド
 
 ```bash
 cd frontend
-cp .env.example .env   # ローカルはVITE_LIFF_ID空のままでOK
+cp .env.example .env   # ローカルはVITE_LIFF_ID空のままでOK（開発ユーザーで動作）
 npm install
 npm run dev            # http://localhost:5173
 ```
 
 > バックエンドとフロントエンドの両方を起動した状態でアクセスしてください。
+
+## デプロイ（Render + LINE LIFF）
+
+概要（詳細な手順は別途）:
+
+1. Render で「New +」→「Blueprint」→ このリポジトリを選択（`render.yaml` を読み込み、DB/API/フロントを一括作成）。
+2. デプロイ完了後、フロントのURLを LINE Developers の LIFF エンドポイントに登録し、発行された **LIFF ID** を取得。
+3. Render のフロントの環境変数に `VITE_LIFF_ID`（と `VITE_API_BASE_URL` = APIのURL+`/api`）を設定して再デプロイ。
+
+- `VITE_*` はビルド時に埋め込まれるため、変更後はフロントの再デプロイが必要です。
+- 無料枠のWeb Serviceは無アクセス時にスリープし、初回起動が遅い点に注意。
 
 ## ドキュメント / Issue
 

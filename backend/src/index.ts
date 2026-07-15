@@ -6,7 +6,9 @@ import { apiRouter } from "./routes";
 
 const app = express();
 
-app.use(cors());
+// CORS_ORIGIN が設定されていればそのオリジンのみ許可、無ければ全許可（MVPデフォルト）
+const corsOrigin = process.env.CORS_ORIGIN;
+app.use(cors(corsOrigin ? { origin: corsOrigin } : undefined));
 app.use(express.json());
 
 app.get("/health", (_req, res) => {

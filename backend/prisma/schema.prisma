@@ -5,9 +5,9 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// MVP開発中はSQLiteを利用。本番はPostgreSQLに切り替える（docs/requirements.md 補足参照）
+// 開発・本番ともにPostgreSQL（ローカルはdocker-composeのPostgresを使用）
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
