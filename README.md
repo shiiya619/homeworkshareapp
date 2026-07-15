@@ -8,7 +8,14 @@
 
 - フロントエンド：Vite + React + TypeScript + LINE LIFF SDK（LINEアプリ内で動作するWebアプリ）
 - バックエンド：Node.js + Express + TypeScript + Prisma
-- DB：PostgreSQL
+- DB：MVP開発中は SQLite（本番はPostgreSQLへ切替予定）
+
+## MVPで動く機能
+
+dev/LIFFログイン → Room作成/入室 → 課題登録 → 課題一覧（締切順）→ 進捗リアクション（着手中/完了）
+
+- ローカルでは `VITE_LIFF_ID` 未設定でも「開発ユーザー」として動作確認できます（devフォールバック）。
+- 課題提出（ファイル共有）・LINE通知などは次フェーズ（[Issues](https://github.com/shiiya619/homeworkshareapp/issues) 参照）。
 
 ## フォルダ構成
 
@@ -37,20 +44,22 @@ homeworkshareapp/
 
 ```bash
 cd backend
-cp .env.example .env   # DATABASE_URL等を設定
+cp .env.example .env   # 初期値のままSQLiteで動きます
 npm install
-npm run prisma:migrate
-npm run dev
+npm run prisma:migrate # SQLite(dev.db)を作成
+npm run dev            # http://localhost:3000
 ```
 
 ### フロントエンド
 
 ```bash
 cd frontend
-cp .env.example .env   # VITE_LIFF_ID等を設定
+cp .env.example .env   # ローカルはVITE_LIFF_ID空のままでOK
 npm install
-npm run dev
+npm run dev            # http://localhost:5173
 ```
+
+> バックエンドとフロントエンドの両方を起動した状態でアクセスしてください。
 
 ## ドキュメント / Issue
 

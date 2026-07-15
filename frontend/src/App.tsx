@@ -1,28 +1,41 @@
-import { useEffect, useState } from "react";
-import { Route, Routes } from "react-router-dom";
-import { initLiff } from "./lib/liff";
+import { Navigate, Route, Routes } from "react-router-dom";
+import { UserProvider, useUser } from "./context/UserContext";
+import { getCurrentRoomId } from "./lib/room";
+import { HomePage } from "./pages/HomePage";
 import { RoomCreatePage } from "./pages/RoomCreatePage";
 import { RoomJoinPage } from "./pages/RoomJoinPage";
 import { TaskCreatePage } from "./pages/TaskCreatePage";
 import { TaskListPage } from "./pages/TaskListPage";
-import { TaskSubmitPage } from "./pages/TaskSubmitPage";
 
-export function App() {
-  const [liffReady, setLiffReady] = useState(false);
+function AppRoutes() {
+  const { loading, error } = useUser();
 
-  useEffect(() => {
-    initLiff().then(() => setLiffReady(true));
-  }, []);
+  if (loading) return <div className="center">ログイン中...</div>;
+  if (error) return <div className="center error">{error}</div>;
 
-  if (!liffReady) return <div>Loading...</div>;
+  const currentRoomId = getCurrentRoomId();
 
   return (
     <Routes>
-      <Route path="/" element={<TaskListPage />} />
+      <Route
+        path="/"
+        element={currentRoomId ? <Navigate to={`/rooms/${currentRoomId}`} replace /> : <HomePage />}
+      />
       <Route path="/rooms/new" element={<RoomCreatePage />} />
       <Route path="/rooms/join" element={<RoomJoinPage />} />
-      <Route path="/tasks/new" element={<TaskCreatePage />} />
-      <Route path="/tasks/:taskId/submit" element={<TaskSubmitPage />} />
+      <Route path="/rooms/:roomId" element={<TaskListPage />} />
+      <Route path="/rooms/:roomId/tasks/new" element={<TaskCreatePage />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+  );
+}
+
+export function App() {
+  return (
+    <UserProvider>
+      <div className="container">
+        <AppRoutes />
+      </div>
+    </UserProvider>
   );
 }

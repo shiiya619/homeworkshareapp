@@ -1,6 +1,7 @@
 import "dotenv/config";
 import cors from "cors";
-import express from "express";
+import express, { type NextFunction, type Request, type Response } from "express";
+import { ZodError } from "zod";
 import { apiRouter } from "./routes";
 
 const app = express();
@@ -13,6 +14,15 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/api", apiRouter);
+
+// エラーハンドリング: zodの検証エラーは400、その他は500でJSONを返す
+app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+  if (err instanceof ZodError) {
+    return res.status(400).json({ message: "入力値が正しくありません。", errors: err.errors });
+  }
+  console.error(err);
+  res.status(500).json({ message: "サーバーエラーが発生しました。" });
+});
 
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 

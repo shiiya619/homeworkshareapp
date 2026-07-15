@@ -1,0 +1,186 @@
+:root {
+  --line-green: #06c755;
+  --bg: #f7f8fa;
+  --card: #ffffff;
+  --text: #222;
+  --muted: #888;
+  --border: #e2e5ea;
+  --danger: #d33;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+h1 {
+  font-size: 1.4rem;
+  margin: 0.4em 0;
+}
+
+.center {
+  text-align: center;
+  padding: 40px 0;
+  color: var(--muted);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.small {
+  font-size: 0.8rem;
+}
+
+.error {
+  color: var(--danger);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.space-between {
+  justify-content: space-between;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+input,
+textarea {
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.btn {
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+  background: var(--line-green);
+  color: #fff;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.btn.secondary {
+  background: #fff;
+  color: var(--line-green);
+  border: 1px solid var(--line-green);
+}
+
+.link {
+  background: none;
+  border: none;
+  color: var(--muted);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 8px 0;
+  font-size: 0.9rem;
+}
+
+code {
+  background: #eef0f3;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  word-break: break-all;
+}
+
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.task-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.task-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.deadline {
+  color: var(--danger);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.desc {
+  margin: 6px 0;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+}
+
+.reactions {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+
+.chip {
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.chip.active {
+  border-color: var(--line-green);
+  color: var(--line-green);
+  font-weight: bold;
+}
+
+.chip.active.done {
+  background: var(--line-green);
+  color: #fff;
+}
